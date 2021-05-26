@@ -1,14 +1,33 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { useParams } from 'react-router-dom'
+import db from '../firebase';
 
-function Details() {
+function Detail() {
+    const { id } = useParams();
+    const [ movie, setMovie ] = useState({})
+
+    useEffect(() => {
+        db.collection("movies")
+        .doc(id)
+        .get()
+        .then((doc) => {
+            if(doc.exists) {
+                setMovie(doc.data());
+            } else {
+                console.log('failed')
+                //redirect to homepage
+            }
+        })
+    }, [])
+
     return (
         <Container>
             <Background>
-                <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/4F39B7E16726ECF419DD7C49E011DD95099AA20A962B0B10AA1881A70661CE45/scale?width=1440&aspectRatio=1.78&format=jpeg"/>
+                <img src={movie.backgroundImg}/>
             </Background>
             <ImageTitle>
-                <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/D7AEE1F05D10FC37C873176AAA26F777FC1B71E7A6563F36C6B1B497CAB1CEC2/scale?width=1440&aspectRatio=1.78"/>
+                <img src={movie.titleImg}/>
             </ImageTitle>
             <Controls>
                 <PlayButton>
@@ -27,16 +46,16 @@ function Details() {
                 </GroupWatchButton>
             </Controls>
             <Subtitle>
-                2018 blah blah blah
+                {movie.subTitle}
             </Subtitle>
             <Description>
-                Description
+                {movie.description}
             </Description>
         </Container>
     )
 }
 
-export default Details
+export default Detail
 
 
 const Container = styled.div `
@@ -62,15 +81,16 @@ const Background = styled.div `
 `
 
 const ImageTitle = styled.div `
+    margin-top: 100px;
     height: 30vh;
     width: 35vw;
-    min-height: 170px;
-    min-width: 200px;
+    min-height: 270px;
+    min-width: 300px;
 
     img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
     }
 `
 
